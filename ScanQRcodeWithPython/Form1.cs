@@ -154,11 +154,32 @@ namespace ScanQRcodeWithPython
             {
                 var qrResJSON = JArray.Parse(qrResContent)[0].ToObject<JObject>();
 
-                richTextBox1.Text = ($"QR Code: {qrResJSON.GetValue("maQR")}\n") +
+                if (qrResJSON!.GetValue("isValid")!.ToString() == "False") {
+                    richTextBox1.Text = ("This QR Code has already been scanned !!!!!\n");
+                }
+                else {
+                    richTextBox1.Text = ($"QR Code: {qrResJSON.GetValue("maQR")}\n") +
                     ($"Account Name: {qrResJSON.GetValue("taiKhoanNguoiDat")}\n") +
                     ($"Total Price: {qrResJSON.GetValue("giaVe")}\n") +
-                    ($"Chairs: {qrResJSON.GetValue("danhSachMaGhe")}\n");
-          
+                    ($"Chairs: {qrResJSON.GetValue("danhSachMaGhe")}\n") +
+                    ($"Movie Name: {qrResJSON!.GetValue("tenPhim")}\n") +
+                    ($"Theater Name: {qrResJSON!.GetValue("tenRap")}\n") +
+                    ($"Date: {qrResJSON!.GetValue("ngayChieu")}\n") +
+                    ($"Time: {qrResJSON!.GetValue("gioChieu")}\n")
+                    ;
+
+                    //Switch from valid to unvalid
+                    string stopValidJSON = "{\"isValid\": false}";
+
+                    //Creating a new Request Message to Server
+                    var httpRequestMessage = new HttpRequestMessage();
+                    httpRequestMessage.Method = HttpMethod.Put;
+                    httpRequestMessage.RequestUri = new Uri($"http://127.0.0.1:8000/api/KiemTraDatVe/{QRCode}");
+                    httpRequestMessage.Content = new StringContent(stopValidJSON, Encoding.UTF8, "application/json");
+
+                    //Send Unvalid Message to Server
+                    await httpClient.SendAsync(httpRequestMessage);
+                }
             }
         }
         class User

@@ -36,12 +36,6 @@ namespace ScanQRcodeWithPython
 
         private void button1_Click(object sender, EventArgs e)// run file.py in one click
         {
-            // lock (syncGate) // synchronized when scan qr and at the time result print in box
-            // {
-            //if (process != null) return; //if you use, you cannot open qrcode again after closing
-            // }
-
-            //output.Clear(); // use if want to clear after close box
             outputChanged = false;
             richTextBox1.Text = "";
             process = new Process();
@@ -58,42 +52,25 @@ namespace ScanQRcodeWithPython
 
         private void OnOutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            //lock (syncGate) ensures that one thread is executing a piece of code at one time
-            //{
             if (sender != process) return;
             output.Clear();
             output.AppendLine(e.Data);                
                 if (outputChanged) return;
                 outputChanged = true;
             BeginInvoke(new Action(OnOutputChanged));
-           // richTextBox1.Text = output.ToString();
-            //}
         }
 
         private void OnOutputChanged()
         {
-            // lock (syncGate)
-            //{
-            //richTextBox1.Text = output.ToString();
-            //Console.WriteLine(output.ToString());
             CheckQR(output.ToString());
-
-            //await check(output.ToString(), user);
-            //Console.WriteLine("abc");
-            //richTextBox1.Text += "abc\n";
-            //richTextBox1.Text += "cde";
-
             outputChanged = false;
-            //}
+          
         }
         private void OnProcessExited(object sender, EventArgs e) //check process exits 
         {
-            //lock (syncGate)
-           // {
                 if (sender != process) return;
                 process.Dispose();
                 process = null;
-            //}
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)//scroll text when new text appear
@@ -154,7 +131,7 @@ namespace ScanQRcodeWithPython
             {
                 var qrResJSON = JArray.Parse(qrResContent)[0].ToObject<JObject>();
 
-                if (qrResJSON!.GetValue("isValid")!.ToString() == "False") {
+                if (qrResJSON.GetValue("isValid").ToString() == "False") {
                     richTextBox1.Text = ("This QR Code has already been scanned !!!!!\n");
                 }
                 else {
@@ -162,10 +139,10 @@ namespace ScanQRcodeWithPython
                     ($"Account Name: {qrResJSON.GetValue("taiKhoanNguoiDat")}\n") +
                     ($"Total Price: {qrResJSON.GetValue("giaVe")}\n") +
                     ($"Chairs: {qrResJSON.GetValue("danhSachMaGhe")}\n") +
-                    ($"Movie Name: {qrResJSON!.GetValue("tenPhim")}\n") +
-                    ($"Theater Name: {qrResJSON!.GetValue("tenRap")}\n") +
-                    ($"Date: {qrResJSON!.GetValue("ngayChieu")}\n") +
-                    ($"Time: {qrResJSON!.GetValue("gioChieu")}\n")
+                    ($"Movie Name: {qrResJSON.GetValue("tenPhim")}\n") +
+                    ($"Theater Name: {qrResJSON.GetValue("tenRap")}\n") +
+                    ($"Date: {qrResJSON.GetValue("ngayChieu")}\n") +
+                    ($"Time: {qrResJSON.GetValue("gioChieu")}\n")
                     ;
 
                     //Switch from valid to unvalid

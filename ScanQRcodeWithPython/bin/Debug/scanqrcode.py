@@ -22,7 +22,7 @@ curr=""
 listcode = []
 while True:
     #print("Waiting to scan:......")
-    now = datetime.now()
+    now = time.now()
     img_resp=urllib.request.urlopen(url+'cam-hi.jpg')
     imgnp=np.array(bytearray(img_resp.read()),dtype=np.uint8)
     frame=cv2.imdecode(imgnp,-1)
@@ -32,13 +32,13 @@ while True:
     for obj in decodedObjects:
         curr=obj.data
         if curr not in listcode:
-            #print(str(now.strftime("%d/%m/%Y %H:%M:%S")) +" "+obj.type +" "+ obj.data.decode("utf-8")+" Valid" ,flush = True)
+            scannedTime = time.now()
             print(obj.data.decode("utf-8"),flush = True)
             listcode.append(curr)
         else:
-            #print(str(now.strftime("%d/%m/%Y %H:%M:%S")) +" "+obj.type +" "+ obj.data.decode("utf-8")+" Invalid" ,flush = True)
-            #print(obj.data.decode("utf-8"),flush = True)
-            pass
+            difference = now - scannedTime
+            if(difference >= 4 ):
+               print(obj.data.decode("utf-8"),flush = True) 
         cv2.putText(frame, str(obj.data.decode("utf-8")), (50, 50), font, 1,(255, 0, 0), 3)
     
         
